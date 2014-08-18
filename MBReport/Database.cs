@@ -47,6 +47,7 @@ namespace MBReport
                 sqlConnectionString += Properties.Settings.Default.dbPassword;
                 sqlConnectionString += ";";
             }
+            sqlConnectionString += "Connection Timeout=5;";
             return sqlConnectionString;
         }
 
@@ -157,8 +158,31 @@ namespace MBReport
 
                 return currency;
             }
-
-
         }
+
+        static public DateTime CurrentRunDate()
+        {
+            using (SqlConnection connection = new SqlConnection(ConstructSqlConnectionString()))
+            {
+                connection.Open();
+
+                SqlCommand sqlCommand =
+                    new SqlCommand("select CurrRunDate from brparms",
+                                    connection);
+
+                SqlDataReader sqlReader = sqlCommand.ExecuteReader();
+
+                DateTime currentRunDate = DateTime.Now;
+                while (sqlReader.Read())
+                {
+                    currentRunDate = Convert.ToDateTime(sqlReader["CurrRunDate"].ToString());
+                }
+                sqlReader.Close();
+
+                return currentRunDate;
+            }
+        }
+
+ 
     }
 }

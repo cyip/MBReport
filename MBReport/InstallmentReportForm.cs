@@ -32,7 +32,7 @@ namespace MBReport
 
         private void populateReportHeader()
         {
-            CreditOfficer parent = (CreditOfficer)this.Owner;
+            MBReport parent = (MBReport)this.Owner;
             TextObject collectionDate = (TextObject)this.InstallmentReport1.ReportDefinition.Sections["Section1"].ReportObjects["CollectionDate"];
             //collectionDate.Text = parent.CollectionDate.ToString();
             collectionDate.Text = "ABC";
@@ -69,6 +69,7 @@ namespace MBReport
                         new SqlCommand("Select r.cid, RTRIM(c.Name1) + ' ' + RTRIM(c.Name2) as Name, l.acc + '-' + l.chd as Account, " +
                                        "l.BalAmt as 'Principle Balance', l.ODuePriAmt as 'Principle Due', " +
                                        "l.AcrIntAmt as 'Interest Due', l.ODuePriAmt as 'Prepaid', " +
+                                       "0 as 'Total Due', " +
                                        "lookup.FullDesc as 'Status', " +
                                        "Convert(varchar(10),CONVERT(date,min(i.DueDate),106),103) as 'Due Date' " +
                                        "from relacc as r " +
@@ -84,7 +85,7 @@ namespace MBReport
                                        "group by r.CID, c.Name1, name2, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc",
                                        connection);
                      SqlDataAdapter adapter = new SqlDataAdapter(sqlCommandOverdue);
-                    CreditOfficer parent = (CreditOfficer)(this.Owner);
+                    MBReport parent = (MBReport)(this.Owner);
 
                     sqlCommandOverdue.Parameters.Add("@cid", parent.Cid);
                     //sqlCommand.Parameters.Add("@collectionDate", DateTime.Parse(parent.CollectionDate.ToString());
@@ -92,17 +93,19 @@ namespace MBReport
                     InstallmentTable dataset = new InstallmentTable();
                     adapter.Fill(dataset, "Installments");
        
-                    //Calculate interest due up to date
+                    
                     foreach(DataRow installment in dataset.Tables["Installments"].Rows)
                     {
+                        //Calculate interest due up to date
+                        // - Iterate each installment row and calculate up to date interest with stored procedure
                         string accountId = installment["Account"].ToString();
                         SqlCommand calcInterestCmd =
                             new SqlCommand("sp_LNCalcInterest", connection);
                         calcInterestCmd.CommandType = CommandType.StoredProcedure;
 
                         calcInterestCmd.Parameters.AddWithValue("@AAcc", accountId);
-                        calcInterestCmd.Parameters.AddWithValue("@FutureDays", (parent.CollectionDate - DateTime.Now).TotalDays);
-                        //calcInterestCmd.Parameters.AddWithValue("@FutureDays", 0);
+                        int numDays = (parent.CollectionDate - Database.CurrentRunDate()).Days;
+                        calcInterestCmd.Parameters.AddWithValue("@FutureDays", numDays);
                         calcInterestCmd.Parameters.AddWithValue("@IntAmt", 0);
                         calcInterestCmd.Parameters["@IntAmt"].Direction = ParameterDirection.Output;
                         calcInterestCmd.Parameters.AddWithValue("@PenAmt", 0);
@@ -112,17 +115,18 @@ namespace MBReport
                         calcInterestCmd.Parameters.AddWithValue("@TrnChgAmt", 0);
                         calcInterestCmd.ExecuteNonQuery();
 
-                        //SqlDataReader sqlReader = calcInterestCmd.ExecuteReader();
                         Int32 interest = (Int32)calcInterestCmd.Parameters["@IntAmt"].Value;
                         installment["Interest Due"] = Convert.ToInt32(installment["Interest Due"].ToString()) + interest;
-                        /*
-                        if (sqlReader.Read())
-                            installment["Interest Due"] = sqlReader["IntAmt"];
-                        else
-                            installment["Interest Due"] = -1;
-                         */
 
-                        //sqlReader.Close();
+                        // Update Total due = principle due + interest due
+                        installment["Total Due"] = Convert.ToInt32(installment["Principle Due"].ToString()) + 
+                                                   Convert.ToInt32(installment["Interest Due"].ToString());
+
+                        //Change account number to proper format
+                        // - “xxx-xxxxxx-xx-x” Ex. “771-001408-08-4”
+                        accountId = accountId.Insert(3, "-");
+                        accountId = accountId.Insert(10, "-");
+                        installment["Account"] = accountId;
                     }
                     dataset.Tables["installments"].AcceptChanges();
 
@@ -147,6 +151,8 @@ namespace MBReport
                     officerName.Text = parent.OfficerName;
                     TextObject villageName = (TextObject)CustomerReport.ReportDefinition.Sections["Section1"].ReportObjects["Village"];
                     villageName.Text = parent.VillageName;
+                    TextObject currency = (TextObject)CustomerReport.ReportDefinition.Sections["Section1"].ReportObjects["Currency"];
+                    currency.Text = Database.Currency();
 
                 }
                 finally

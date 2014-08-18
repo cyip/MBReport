@@ -297,6 +297,10 @@ namespace MBReport {
             
             private global::System.Data.DataColumn columnStatus;
             
+            private global::System.Data.DataColumn columnSaving_Account;
+            
+            private global::System.Data.DataColumn columnTotal_Due;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public InstallmentTableDataTable() {
@@ -404,6 +408,22 @@ namespace MBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Saving_AccountColumn {
+                get {
+                    return this.columnSaving_Account;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Total_DueColumn {
+                get {
+                    return this.columnTotal_Due;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -439,7 +459,7 @@ namespace MBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public InstallmentTableRow AddInstallmentTableRow(string CID, string Name, string Account, string Principle_Balance, string Principle_Due, string Interest_Due, string Due_Date, string Prepaid, string Status) {
+            public InstallmentTableRow AddInstallmentTableRow(string CID, string Name, string Account, string Principle_Balance, string Principle_Due, string Interest_Due, string Due_Date, string Prepaid, string Status, string Saving_Account, string Total_Due) {
                 InstallmentTableRow rowInstallmentTableRow = ((InstallmentTableRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         CID,
@@ -450,7 +470,9 @@ namespace MBReport {
                         Interest_Due,
                         Due_Date,
                         Prepaid,
-                        Status};
+                        Status,
+                        Saving_Account,
+                        Total_Due};
                 rowInstallmentTableRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowInstallmentTableRow);
                 return rowInstallmentTableRow;
@@ -482,6 +504,8 @@ namespace MBReport {
                 this.columnDue_Date = base.Columns["Due Date"];
                 this.columnPrepaid = base.Columns["Prepaid"];
                 this.columnStatus = base.Columns["Status"];
+                this.columnSaving_Account = base.Columns["Saving Account"];
+                this.columnTotal_Due = base.Columns["Total Due"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -505,6 +529,10 @@ namespace MBReport {
                 base.Columns.Add(this.columnPrepaid);
                 this.columnStatus = new global::System.Data.DataColumn("Status", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnStatus);
+                this.columnSaving_Account = new global::System.Data.DataColumn("Saving Account", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnSaving_Account);
+                this.columnTotal_Due = new global::System.Data.DataColumn("Total Due", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnTotal_Due);
                 this.ExtendedProperties.Add("Generator_TablePropName", "_InstallmentTable");
                 this.ExtendedProperties.Add("Generator_UserTableName", "InstallmentTable");
             }
@@ -793,6 +821,38 @@ namespace MBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string Saving_Account {
+                get {
+                    try {
+                        return ((string)(this[this.tableInstallmentTable.Saving_AccountColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Saving Account\' in table \'InstallmentTable\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableInstallmentTable.Saving_AccountColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string Total_Due {
+                get {
+                    try {
+                        return ((string)(this[this.tableInstallmentTable.Total_DueColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Total Due\' in table \'InstallmentTable\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableInstallmentTable.Total_DueColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsCIDNull() {
                 return this.IsNull(this.tableInstallmentTable.CIDColumn);
             }
@@ -897,6 +957,30 @@ namespace MBReport {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetStatusNull() {
                 this[this.tableInstallmentTable.StatusColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsSaving_AccountNull() {
+                return this.IsNull(this.tableInstallmentTable.Saving_AccountColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetSaving_AccountNull() {
+                this[this.tableInstallmentTable.Saving_AccountColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsTotal_DueNull() {
+                return this.IsNull(this.tableInstallmentTable.Total_DueColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetTotal_DueNull() {
+                this[this.tableInstallmentTable.Total_DueColumn] = global::System.Convert.DBNull;
             }
         }
         

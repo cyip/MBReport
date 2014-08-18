@@ -24,6 +24,8 @@
               <xs:element name="Due_x0020_Date" msprop:Generator_ColumnVarNameInTable="columnDue_Date" msprop:Generator_ColumnPropNameInRow="Due_Date" msprop:Generator_ColumnPropNameInTable="Due_DateColumn" msprop:Generator_UserColumnName="Due Date" type="xs:string" minOccurs="0" />
               <xs:element name="Prepaid" msprop:Generator_ColumnVarNameInTable="columnPrepaid" msprop:Generator_ColumnPropNameInRow="Prepaid" msprop:Generator_ColumnPropNameInTable="PrepaidColumn" msprop:Generator_UserColumnName="Prepaid" type="xs:string" minOccurs="0" />
               <xs:element name="Status" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_ColumnPropNameInRow="Status" msprop:Generator_ColumnPropNameInTable="StatusColumn" msprop:Generator_UserColumnName="Status" type="xs:string" minOccurs="0" />
+              <xs:element name="Saving_x0020_Account" msprop:Generator_ColumnVarNameInTable="columnSaving_Account" msprop:Generator_ColumnPropNameInRow="Saving_Account" msprop:Generator_ColumnPropNameInTable="Saving_AccountColumn" msprop:Generator_UserColumnName="Saving Account" type="xs:string" minOccurs="0" />
+              <xs:element name="Total_x0020_Due" msprop:Generator_ColumnVarNameInTable="columnTotal_Due" msprop:Generator_ColumnPropNameInRow="Total_Due" msprop:Generator_ColumnPropNameInTable="Total_DueColumn" msprop:Generator_UserColumnName="Total Due" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

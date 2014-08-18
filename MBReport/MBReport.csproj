@@ -92,6 +92,7 @@
     <Compile Include="CreditOfficer.Designer.cs">
       <DependentUpon>CreditOfficer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database.cs" />
     <Compile Include="InstallmentReportForm.cs">
       <SubType>Form</SubType>
     </Compile>
