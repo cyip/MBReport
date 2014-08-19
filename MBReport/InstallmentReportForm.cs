@@ -70,7 +70,9 @@ namespace MBReport
                                        "l.BalAmt as 'Principle Balance', l.ODuePriAmt as 'Principle Due', " +
                                        "l.AcrIntAmt as 'Interest Due', l.ODuePriAmt as 'Prepaid', " +
                                        "0 as 'Total Due', " +
+                                       "0 as 'Saving Amount', " +
                                        "lookup.FullDesc as 'Status', " +
+                                       "l.Tracc + '-' + TrChd as 'Saving Account', " +
                                        "Convert(varchar(10),CONVERT(date,min(i.DueDate),106),103) as 'Due Date' " +
                                        "from relacc as r " +
                                        "inner join CIF as c on r.CID=c.CID " +
@@ -82,7 +84,7 @@ namespace MBReport
                                        "where rc.cid = @cid and (l.AccStatus > '01' and l.AccStatus < '99') and " +
                                        "lookup.lookupid = 'AS' and lookup.lookupcode like '4%' and lookup.langtype = '001' " +
                                        "and l.OduePriAmt > 0 " +
-                                       "group by r.CID, c.Name1, name2, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc",
+                                       "group by r.CID, c.Name1, name2, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc, l.Tracc, l.TrChd",
                                        connection);
                      SqlDataAdapter adapter = new SqlDataAdapter(sqlCommandOverdue);
                     MBReport parent = (MBReport)(this.Owner);
@@ -127,6 +129,34 @@ namespace MBReport
                         accountId = accountId.Insert(3, "-");
                         accountId = accountId.Insert(10, "-");
                         installment["Account"] = accountId;
+
+                        //Get saving account if there is no associated recovery account 
+                        // If it has Recovery Account, shows account id. should starts with 111.
+                        // If Recovery account is empty, shows account id starts with 112.
+                        // Show 111-xxxxxx-xx-x if loan has link with recovery saving (For KHR database)
+                        // Show 112-xxxxxx-xx-x if loan has no link with recovery saving(For KHR database)
+                        // Show 221-xxxxxx-xx-x if loan has link with recovery saving (For USD database)
+                        // Show 222-xxxxxx-xx-x if loan has no link with recovery saving(For USD database)
+                        //Also sums up balance across all saving accounts
+                        string savingAccountId, savingAmount;
+                        Database.SavingAccount(installment["cid"].ToString(),
+                                               out savingAccountId,
+                                               out savingAmount);
+                        installment["Saving Amount"] = savingAmount;
+                        if (String.IsNullOrEmpty(installment["Saving Account"].ToString()))
+                        {
+                            installment["Saving Account"] = savingAccountId;
+                        }
+
+                        //Change saving account to proper format
+                        savingAccountId = installment["Saving Account"].ToString();
+                        if(!String.IsNullOrEmpty(savingAccountId))
+                       {
+                            savingAccountId = savingAccountId.Insert(3, "-");
+                            savingAccountId = savingAccountId.Insert(10, "-");
+                            
+                            installment["Saving Account"] = savingAccountId;
+                        }
                     }
                     dataset.Tables["installments"].AcceptChanges();
 

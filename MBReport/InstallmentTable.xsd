@@ -26,6 +26,7 @@
               <xs:element name="Status" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_ColumnPropNameInRow="Status" msprop:Generator_ColumnPropNameInTable="StatusColumn" msprop:Generator_UserColumnName="Status" type="xs:string" minOccurs="0" />
               <xs:element name="Saving_x0020_Account" msprop:Generator_ColumnVarNameInTable="columnSaving_Account" msprop:Generator_ColumnPropNameInRow="Saving_Account" msprop:Generator_ColumnPropNameInTable="Saving_AccountColumn" msprop:Generator_UserColumnName="Saving Account" type="xs:string" minOccurs="0" />
               <xs:element name="Total_x0020_Due" msprop:Generator_ColumnVarNameInTable="columnTotal_Due" msprop:Generator_ColumnPropNameInRow="Total_Due" msprop:Generator_ColumnPropNameInTable="Total_DueColumn" msprop:Generator_UserColumnName="Total Due" type="xs:string" minOccurs="0" />
+              <xs:element name="Saving_x0020_Amount" msprop:Generator_ColumnVarNameInTable="columnSaving_Amount" msprop:Generator_ColumnPropNameInRow="Saving_Amount" msprop:Generator_ColumnPropNameInTable="Saving_AmountColumn" msprop:Generator_UserColumnName="Saving Amount" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

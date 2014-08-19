@@ -183,6 +183,43 @@ namespace MBReport
             }
         }
 
+        static public void SavingAccount(string cid, out string savingAccountId, out string savingAmount)
+        {
+            string currency = Currency();
+
+            using (SqlConnection connection = new SqlConnection(ConstructSqlConnectionString()))
+            {
+                connection.Open();
+
+                string accPrefix = @"11%";
+                if (currency.ToUpper() == "USD")
+                    accPrefix = @"22%";
+
+                SqlCommand sqlCommand =
+                    new SqlCommand("select r.ACC + '-' + r.chd as savacc, s.BalAmt from RELACC r " +
+                                   "inner join SVACC s on s.Acc = r.Acc " +
+                                   "where CID=@cid",
+                                    connection);
+
+                sqlCommand.Parameters.Add("@cid", cid);
+
+                SqlDataReader sqlReader = sqlCommand.ExecuteReader();
+
+                savingAccountId = "";
+                int savingAmountInt = 0;
+                while (sqlReader.Read())
+                {
+                    if(sqlReader["savacc"].ToString().Substring(2,1) == "2")
+                        savingAccountId = sqlReader["savacc"].ToString();
+
+                    savingAmountInt += Convert.ToInt32(sqlReader["BalAmt"].ToString());
+                }
+
+                savingAmount = Convert.ToString(savingAmountInt);
+
+                sqlReader.Close();
+            }
+        }
  
     }
 }
