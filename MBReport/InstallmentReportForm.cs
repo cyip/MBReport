@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
 using System.IO;
+using System.Globalization;
 
 namespace MBReport
 {
@@ -66,9 +67,10 @@ namespace MBReport
                      */
                      
                      SqlCommand sqlCommandOverdue =
-                        new SqlCommand("Select r.cid, RTRIM(c.Name1) + ' ' + RTRIM(c.Name2) as Name, l.acc + '-' + l.chd as Account, " +
-                                       "l.BalAmt as 'Principle Balance', l.ODuePriAmt as 'Principle Due', " +
-                                       "l.AcrIntAmt as 'Interest Due', l.ODuePriAmt as 'Prepaid', " +
+                        new SqlCommand("Select r.cid, RTRIM(ISNULL(c.Name1,'')) + ' ' + RTRIM(ISNULL(c.Name2,'')) + ' ' + RTRIM(ISNULL(c.Name3,'')) + ' ' + RTRIM(ISNULL(c.Name4,'')) as Name, l.acc + '-' + l.chd as Account, " +
+                                       "parsename(convert(varchar(100), cast(l.BalAmt as money), 1), 2) as 'Principle Balance', " +
+                                       "parsename(convert(varchar(100), cast(l.ODuePriAmt as money), 1), 2) as 'Principle Due', " +
+                                       "parsename(convert(varchar(100), cast(l.AcrIntAmt as money), 1), 2) as 'Interest Due', l.ODuePriAmt as 'Prepaid', " +
                                        "0 as 'Total Due', " +
                                        "0 as 'Saving Amount', " +
                                        "lookup.FullDesc as 'Status', " +
@@ -84,7 +86,7 @@ namespace MBReport
                                        "where rc.cid = @cid and (l.AccStatus > '01' and l.AccStatus < '99') and " +
                                        "lookup.lookupid = 'AS' and lookup.lookupcode like '4%' and lookup.langtype = '001' " +
                                        "and l.OduePriAmt > 0 " +
-                                       "group by r.CID, c.Name1, name2, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc, l.Tracc, l.TrChd",
+                                       "group by r.CID, c.Name1, c.name2, c.Name3, c.Name4, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc, l.Tracc, l.TrChd",
                                        connection);
                      SqlDataAdapter adapter = new SqlDataAdapter(sqlCommandOverdue);
                     MBReport parent = (MBReport)(this.Owner);
@@ -118,11 +120,17 @@ namespace MBReport
                         calcInterestCmd.ExecuteNonQuery();
 
                         Int32 interest = (Int32)calcInterestCmd.Parameters["@IntAmt"].Value;
-                        installment["Interest Due"] = Convert.ToInt32(installment["Interest Due"].ToString()) + interest;
+                        //Test
+                        string test = installment["Interest Due"].ToString();
+                        //Int32 test1 = Convert.ToInt32(test);
+                        Int32 test1 = int.Parse(test, NumberStyles.AllowThousands);
+                        //End Test
+                        //installment["Interest Due"] = Convert.ToInt32(installment["Interest Due"].ToString()) + interest;
+                        installment["Interest Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.AllowThousands) + interest;
 
                         // Update Total due = principle due + interest due
-                        installment["Total Due"] = Convert.ToInt32(installment["Principle Due"].ToString()) + 
-                                                   Convert.ToInt32(installment["Interest Due"].ToString());
+                        installment["Total Due"] = int.Parse(installment["Principle Due"].ToString(), NumberStyles.AllowThousands) +
+                                                   int.Parse(installment["Interest Due"].ToString(), NumberStyles.AllowThousands);
 
                         //Change account number to proper format
                         // - “xxx-xxxxxx-xx-x” Ex. “771-001408-08-4”
