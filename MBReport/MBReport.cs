@@ -20,6 +20,13 @@ namespace MBReport
             {
                 populateVillages(this.creditOfficerComboBox.SelectedValue.ToString());
             }
+            populateStatus();
+        }
+
+        private void populateStatus()
+        {
+            this.statusComboBox.Items.AddRange(new object[] { "Due", "All" });
+            this.statusComboBox.SelectedIndex = 0;
         }
 
         private void populateCreditOfficers()
@@ -76,6 +83,21 @@ namespace MBReport
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        public string Status
+        {
+            get
+            {
+                if (this.statusComboBox.SelectedIndex != -1)
+                {
+                    return this.statusComboBox.SelectedText.ToString();
+                }
+                else
+                {
+                    return "";
+                }
+            }
         }
 
         public string Cid

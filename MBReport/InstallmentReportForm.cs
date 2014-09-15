@@ -65,34 +65,41 @@ namespace MBReport
                                        "and i.PaidDate is NULL and i.DueDate <= @collectonDate and l.OduePriAmt <= 0 ",
                                        connection);
                      */
-                     
-                     SqlCommand sqlCommandOverdue =
-                        new SqlCommand("Select r.cid, RTRIM(ISNULL(c.Name1,'')) + ' ' + RTRIM(ISNULL(c.Name2,'')) + ' ' + RTRIM(ISNULL(c.Name3,'')) + ' ' + RTRIM(ISNULL(c.Name4,'')) as Name, l.acc + '-' + l.chd as Account, " +
-                                       "parsename(convert(varchar(100), cast(l.BalAmt as money), 1), 2) as 'Principle Balance', " +
-                                       "parsename(convert(varchar(100), cast(l.ODuePriAmt as money), 1), 2) as 'Principle Due', " +
-                                       "parsename(convert(varchar(100), cast(l.AcrIntAmt as money), 1), 2) as 'Interest Due', l.ODuePriAmt as 'Prepaid', " +
-                                       "0 as 'Total Due', " +
-                                       "0 as 'Saving Amount', " +
-                                       "lookup.FullDesc as 'Status', " +
-                                       "l.Tracc + '-' + TrChd as 'Saving Account', " +
-                                       "Convert(varchar(10),CONVERT(date,min(i.DueDate),106),103) as 'Due Date' " +
-                                       "from relacc as r " +
-                                       "inner join CIF as c on r.CID=c.CID " +
-                                       "inner join lnacc as l on l.acc=r.ACC " +
-                                       "inner join address as a on a.cid=r.CID " +
-                                       "inner join RELCID as rc on r.cid = rc.RelatedCID " +
-                                       "inner join lninst as i on i.acc = l.acc " +
-                                       "inner join lookup lookup on lookup.LookUpCode = '4' + l.AccStatus " +
-                                       "where rc.cid = @cid and (l.AccStatus > '01' and l.AccStatus < '99') and " +
-                                       "lookup.lookupid = 'AS' and lookup.lookupcode like '4%' and lookup.langtype = '001' " +
-                                       "and l.OduePriAmt > 0 " +
-                                       "group by r.CID, c.Name1, c.name2, c.Name3, c.Name4, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc, l.Tracc, l.TrChd",
-                                       connection);
-                     SqlDataAdapter adapter = new SqlDataAdapter(sqlCommandOverdue);
+                    string sqlCommandOverdueStr =
+                                       "Select r.cid, RTRIM(ISNULL(c.Name1,'')) + ' ' + RTRIM(ISNULL(c.Name2,'')) + ' ' + RTRIM(ISNULL(c.Name3,'')) + ' ' + RTRIM(ISNULL(c.Name4,'')) as Name, l.acc + '-' + l.chd as Account, " +
+                                      "parsename(convert(varchar(100), cast(l.BalAmt as money), 1), 2) as 'Principle Balance', " +
+                                      "parsename(convert(varchar(100), cast((l.ODuePriAmt + SUM(coalesce(i.PriAmt, 0))) as money), 1), 2) as 'Principle Due', " +
+                                      "parsename(convert(varchar(100), cast(l.AcrIntAmt as money), 1), 2) as 'Interest Due', l.ODuePriAmt as 'Prepaid', " +
+                                      "0 as 'Total Due', " +
+                                      "0 as 'Saving Amount', " +
+                                      "lookup.FullDesc as 'Status', " +
+                                      "l.Tracc + '-' + TrChd as 'Saving Account', " +
+                                      "case when l.OduePriAmt > 0 then 'overdue' else Convert(varchar(10),CONVERT(date,min(i.DueDate),106),103) end as 'Due Date' " +
+                                      "from relacc as r " +
+                                      "inner join CIF as c on r.CID=c.CID " +
+                                      "inner join lnacc as l on l.acc=r.ACC " +
+                                      "inner join address as a on a.cid=r.CID " +
+                                      "inner join RELCID as rc on r.cid = rc.RelatedCID " +
+                                      "left outer join lninst as i on i.acc = l.acc and i.DueDate between (select DATEADD(dd, 1, CurrRunDate) from brparms) and @collectionDate " +
+                                      "inner join lookup lookup on lookup.LookUpCode = '4' + l.AccStatus " +
+                                      "where rc.cid = @cid and (l.AccStatus > '01' and l.AccStatus < '99') and " +
+                                      "lookup.lookupid = 'AS' and lookup.lookupcode like '4%' and lookup.langtype = '001' ";
+
                     MBReport parent = (MBReport)(this.Owner);
+                    /*
+                    if(parent.status == "Due")
+                    {
+                        sqlCommandOverdueStr += " and 
+                     */
+                                      
+                    sqlCommandOverdueStr += "group by r.CID, c.Name1, c.name2, c.Name3, c.Name4, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc, l.Tracc, l.TrChd";
+
+                    SqlCommand sqlCommandOverdue = new SqlCommand(sqlCommandOverdueStr, connection);
+                    SqlDataAdapter adapter = new SqlDataAdapter(sqlCommandOverdue);
+                    
 
                     sqlCommandOverdue.Parameters.Add("@cid", parent.Cid);
-                    //sqlCommand.Parameters.Add("@collectionDate", DateTime.Parse(parent.CollectionDate.ToString());
+                    sqlCommandOverdue.Parameters.Add("@collectionDate", DateTime.Parse(parent.CollectionDate.ToString()));
 
                     InstallmentTable dataset = new InstallmentTable();
                     adapter.Fill(dataset, "Installments");
@@ -129,8 +136,8 @@ namespace MBReport
                         installment["Interest Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.AllowThousands) + interest;
 
                         // Update Total due = principle due + interest due
-                        installment["Total Due"] = int.Parse(installment["Principle Due"].ToString(), NumberStyles.AllowThousands) +
-                                                   int.Parse(installment["Interest Due"].ToString(), NumberStyles.AllowThousands);
+                        installment["Total Due"] = int.Parse(installment["Principle Due"].ToString(), NumberStyles.Number) +
+                                                   int.Parse(installment["Interest Due"].ToString(), NumberStyles.Number);
 
                         //Change account number to proper format
                         // - “xxx-xxxxxx-xx-x” Ex. “771-001408-08-4”

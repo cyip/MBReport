@@ -40,6 +40,8 @@
             this.creditOfficerLabel = new System.Windows.Forms.Label();
             this.village = new System.Windows.Forms.Label();
             this.collectionDate = new System.Windows.Forms.Label();
+            this.statusComboBox = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -138,11 +140,30 @@
             this.collectionDate.TabIndex = 9;
             this.collectionDate.Text = "Collection Date";
             // 
+            // statusComboBox
+            // 
+            this.statusComboBox.FormattingEnabled = true;
+            this.statusComboBox.Location = new System.Drawing.Point(12, 110);
+            this.statusComboBox.Name = "statusComboBox";
+            this.statusComboBox.Size = new System.Drawing.Size(201, 21);
+            this.statusComboBox.TabIndex = 10;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 94);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(37, 13);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "Status";
+            // 
             // MBReport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(450, 209);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.statusComboBox);
             this.Controls.Add(this.collectionDate);
             this.Controls.Add(this.village);
             this.Controls.Add(this.creditOfficerLabel);
@@ -175,6 +196,8 @@
         private System.Windows.Forms.Label creditOfficerLabel;
         private System.Windows.Forms.Label village;
         private System.Windows.Forms.Label collectionDate;
+        private System.Windows.Forms.ComboBox statusComboBox;
+        private System.Windows.Forms.Label label1;
     }
 }
 
