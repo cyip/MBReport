@@ -35,8 +35,6 @@ namespace MBReport
         {
             MBReport parent = (MBReport)this.Owner;
             TextObject collectionDate = (TextObject)this.InstallmentReport1.ReportDefinition.Sections["Section1"].ReportObjects["CollectionDate"];
-            //collectionDate.Text = parent.CollectionDate.ToString();
-            collectionDate.Text = "ABC";
         }
 
 
@@ -85,15 +83,10 @@ namespace MBReport
                                       "where rc.cid = @cid and (l.AccStatus > '01' and l.AccStatus < '99') and " +
                                       "lookup.lookupid = 'AS' and lookup.lookupcode like '4%' and lookup.langtype = '001' ";
 
-                    MBReport parent = (MBReport)(this.Owner);
-                    /*
-                    if(parent.status == "Due")
-                    {
-                        sqlCommandOverdueStr += " and 
-                     */
                                       
                     sqlCommandOverdueStr += "group by r.CID, c.Name1, c.name2, c.Name3, c.Name4, l.Acc, l.chd, l.BalAmt, l.OduePriAmt, l.AcrIntAmt, l.AccStatus, lookup.FullDesc, l.Tracc, l.TrChd";
 
+                    MBReport parent = (MBReport)(this.Owner);
                     SqlCommand sqlCommandOverdue = new SqlCommand(sqlCommandOverdueStr, connection);
                     SqlDataAdapter adapter = new SqlDataAdapter(sqlCommandOverdue);
                     
@@ -107,6 +100,12 @@ namespace MBReport
                     
                     foreach(DataRow installment in dataset.Tables["Installments"].Rows)
                     {
+                        if (parent.Status == "Due" && installment["Due Date"] == DBNull.Value)
+                        {
+                            installment.Delete();
+                            continue;
+                        }
+
                         //Calculate interest due up to date
                         // - Iterate each installment row and calculate up to date interest with stored procedure
                         string accountId = installment["Account"].ToString();
@@ -127,11 +126,6 @@ namespace MBReport
                         calcInterestCmd.ExecuteNonQuery();
 
                         Int32 interest = (Int32)calcInterestCmd.Parameters["@IntAmt"].Value;
-                        //Test
-                        string test = installment["Interest Due"].ToString();
-                        //Int32 test1 = Convert.ToInt32(test);
-                        Int32 test1 = int.Parse(test, NumberStyles.AllowThousands);
-                        //End Test
                         //installment["Interest Due"] = Convert.ToInt32(installment["Interest Due"].ToString()) + interest;
                         installment["Interest Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.AllowThousands) + interest;
 
@@ -166,12 +160,13 @@ namespace MBReport
                         //Change saving account to proper format
                         savingAccountId = installment["Saving Account"].ToString();
                         if(!String.IsNullOrEmpty(savingAccountId))
-                       {
+                        {
                             savingAccountId = savingAccountId.Insert(3, "-");
                             savingAccountId = savingAccountId.Insert(10, "-");
                             
                             installment["Saving Account"] = savingAccountId;
                         }
+
                     }
                     dataset.Tables["installments"].AcceptChanges();
 
@@ -198,6 +193,8 @@ namespace MBReport
                     villageName.Text = parent.VillageName;
                     TextObject currency = (TextObject)CustomerReport.ReportDefinition.Sections["Section1"].ReportObjects["Currency"];
                     currency.Text = Database.Currency();
+                    TextObject title = (TextObject)CustomerReport.ReportDefinition.Sections["Section1"].ReportObjects["Title"];
+                    title.Text = parent.Status + " Collection Report";
 
                 }
                 finally

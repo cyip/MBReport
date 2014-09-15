@@ -91,7 +91,7 @@ namespace MBReport
             {
                 if (this.statusComboBox.SelectedIndex != -1)
                 {
-                    return this.statusComboBox.SelectedText.ToString();
+                    return this.statusComboBox.SelectedItem.ToString();
                 }
                 else
                 {
