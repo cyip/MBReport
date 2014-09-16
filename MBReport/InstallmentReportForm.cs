@@ -167,6 +167,17 @@ namespace MBReport
                             installment["Saving Account"] = savingAccountId;
                         }
 
+                        //Divide all dollar amounts if it's USD database
+                        if (Database.Currency() == "USD")
+                        {
+                            installment["Principle Balance"] = int.Parse(installment["Principle Balance"].ToString(), NumberStyles.Number) / 10;
+                            installment["Principle Due"] = int.Parse(installment["Principle Due"].ToString(), NumberStyles.Number) / 10;
+                            installment["Interest Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.Number) / 10;
+                            installment["Prepaid"] = int.Parse(installment["Prepaid"].ToString(), NumberStyles.Number) / 10;
+                            installment["Total Due"] = int.Parse(installment["Total Due"].ToString(), NumberStyles.Number) / 10;
+                            installment["Saving Amount"] = int.Parse(installment["Saving Amount"].ToString(), NumberStyles.Number) / 10;
+                        }
+
                     }
                     dataset.Tables["installments"].AcceptChanges();
 
