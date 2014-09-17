@@ -127,11 +127,17 @@ namespace MBReport
 
                         Int32 interest = (Int32)calcInterestCmd.Parameters["@IntAmt"].Value;
                         //installment["Interest Due"] = Convert.ToInt32(installment["Interest Due"].ToString()) + interest;
-                        installment["Interest Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.AllowThousands) + interest;
+                        installment["Interest Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.Number);//+interest;
 
                         // Update Total due = principle due + interest due
-                        installment["Total Due"] = int.Parse(installment["Principle Due"].ToString(), NumberStyles.Number) +
-                                                   int.Parse(installment["Interest Due"].ToString(), NumberStyles.Number);
+                        // If principle due  < 0 (prepaid) do not include that in Total Due.
+                        // Prepaid amount only covers priciple due, not interest due.
+                        int principleDue = int.Parse(installment["Principle Due"].ToString(), NumberStyles.Number);
+                        installment["Total Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.Number);
+                        if (principleDue > 0)
+                        {
+                            installment["Total Due"] = int.Parse(installment["Interest Due"].ToString(), NumberStyles.Number) + principleDue;
+                        }
 
                         //Change account number to proper format
                         // - “xxx-xxxxxx-xx-x” Ex. “771-001408-08-4”
