@@ -93,18 +93,17 @@
       <DependentUpon>CreditOfficer.cs</DependentUpon>
     </Compile>
     <Compile Include="Database.cs" />
+    <Compile Include="InstallmentReport.cs">
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>InstallmentReport.rpt</DependentUpon>
+    </Compile>
     <Compile Include="InstallmentReportForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InstallmentReportForm.Designer.cs">
       <DependentUpon>InstallmentReportForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InstallmentReport.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>InstallmentReport.rpt</DependentUpon>
-      <SubType>Component</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="InstallmentTable.cs">
       <DependentUpon>InstallmentTable.xsd</DependentUpon>
@@ -138,8 +137,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="InstallmentReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>InstallmentReport.cs</LastGenOutput>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LastGenOutput>InstallmentReport.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="MBReport.resx">
       <DependentUpon>MBReport.cs</DependentUpon>

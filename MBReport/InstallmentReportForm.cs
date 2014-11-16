@@ -97,11 +97,6 @@ namespace MBReport
                     InstallmentTable dataset = new InstallmentTable();
                     adapter.Fill(dataset, "Installments");
 
-                    int principleBalanceSum = 0;
-                    int principleDueSum = 0;
-                    int interestDueSum = 0;
-                    int savingAmountSum = 0;
-                    int totalDueSum = 0;
                     foreach(DataRow installment in dataset.Tables["Installments"].Rows)
                     {
                         if (parent.Status == "Due" && installment["Due Date"] == DBNull.Value)
@@ -188,13 +183,6 @@ namespace MBReport
                             installment["Saving Amount"] = int.Parse(installment["Saving Amount"].ToString(), NumberStyles.Number) / 10;
                         }
 
-                        // Calculate sum of amounts
-                        principleBalanceSum += int.Parse(installment["Principle Balance"].ToString(), NumberStyles.Number);
-                        principleDueSum += int.Parse(installment["Principle Due"].ToString(), NumberStyles.Number);
-                        interestDueSum += int.Parse(installment["Interest Due"].ToString(), NumberStyles.Number);
-                        savingAmountSum += int.Parse(installment["Saving Amount"].ToString(), NumberStyles.Number);
-                        totalDueSum += int.Parse(installment["Total Due"].ToString(), NumberStyles.Number);
-
                     }
                     dataset.Tables["installments"].AcceptChanges();
 
@@ -209,18 +197,6 @@ namespace MBReport
                     //Form installmentReportForm = new InstallmentReportForm();
                     this.installmentReportViewer.ReportSource = CustomerReport;
                     this.installmentReportViewer.Refresh();
-
-                    // Update report footer
-                    TextObject principleBalanceSumText = (TextObject)CustomerReport.ReportDefinition.Sections["Section4"].ReportObjects["PrincipleBalanceSum"];
-                    principleBalanceSumText.Text = Convert.ToString(principleBalanceSum);
-                    TextObject principleDueSumText = (TextObject)CustomerReport.ReportDefinition.Sections["Section4"].ReportObjects["PrincipleDueSum"];
-                    principleDueSumText.Text = Convert.ToString(principleDueSum);
-                    TextObject interestDueSumText = (TextObject)CustomerReport.ReportDefinition.Sections["Section4"].ReportObjects["InterestDueSum"];
-                    interestDueSumText.Text = Convert.ToString(interestDueSum);
-                    TextObject savingAmountSumText = (TextObject)CustomerReport.ReportDefinition.Sections["Section4"].ReportObjects["SavingAmountSum"];
-                    savingAmountSumText.Text = Convert.ToString(savingAmountSum);
-                    TextObject totalDueSumText = (TextObject)CustomerReport.ReportDefinition.Sections["Section4"].ReportObjects["TotalDueSum"];
-                    totalDueSumText.Text = Convert.ToString(totalDueSum);
 
                     // Populate Header Text Fields
                     // i.e. loan officer, village, collection date
